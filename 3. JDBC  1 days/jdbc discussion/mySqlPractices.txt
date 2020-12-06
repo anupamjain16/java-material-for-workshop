@@ -1,0 +1,1676 @@
+
+SQL with mysql
+==============
+
+	=> creating database and table
+	=> CURD operations
+	=> basic SQL quaries Keywords: select, from,where, groupby, having
+
+
+
+SQL Quaries:	DML, DDL, Control quaries
+
+MySQL command 
+------------------
+creating database:		CREATE DATABASE IF NOT EXISTS Employee;
+
+shows all databases:		show databases;
+
+
+listing all tables in database:	SHOW TABLES;
+
+creating tables
+-------------------
+CREATE TABLE Emp
+(
+    Eid INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    Ename VARCHAR(20), City VARCHAR(15),
+    Designation VARCHAR(20), Salary INT
+);
+
+
+create table emp
+(
+    eid int not null auto_increment primary key,
+    ename varchar(20) not null,
+    city varchar(15),
+    designation varchar(20),
+    salary int
+);
+
+
+
+
+
+ALTER TABLE:		ALTER TABLE Emp RENAME TO employe;
+
+			ALTER TABLE Emp ADD Age numeric(3);
+
+			ALTER TABLE Emp MODIFY Ename VARCHAR(22) NOT NULL;
+
+			ALTER TABLE Emp DROP COLUMN Age;
+
+
+
+Drop the table:		DROP TABLE IF EXISTS employee;
+
+
+changing the column name:
+
+	alter table nameOfthetable change oldColumnName newColumnName varchar (10) ;
+
+
+
+
+CURD Operations:
+-----------------
+
+create table emp
+(
+    eid int not null auto_increment primary key,
+    ename varchar(20) not null,
+    city varchar(15),
+    designation varchar(20),
+    salary int
+);
+
+
+INSERT Statement
+----------------
+	INSERT INTO emp(ename,city,designation,salary) VALUES('Raj','delhi','trainer',20000);
+
+
+UPDATE Statement
+----------------------
+	UPDATE emp SET Salary = Salary*1.03 WHERE Perks > 800;
+
+
+DELETE Statement
+------------------
+	DELETE FROM Emp WHERE Salary<10000;
+
+
+
+REPLACE Statement
+--------------------
+	REPLACE Statement works exactly same as the INSERT Statement, 
+	except only then if an old record in the table has the same 
+	value as in new row for a PRIMARY KEY or UNIQUE index then old 
+	row is deleted and new row is inserted. 
+
+	REPLACE INTO Emp VALUES(6,'Amar','Chennai','Developer',16000,1124);
+
+
+TRUNCATE Statement 
+--------------------
+	TRUNCATE Statement is also used to empty 
+	the table completely. 
+
+	TRUNCATE Emp1;
+
+
+
+
+
+
+basic SQL quaries Keywords
+-------------------
+SELECT 
+FROM
+WHERE
+GROUP BY
+HAVING
+ORDER BY
+LIMIT
+
+
+
+SELECT * FROM Emp;
+
+
+
+SELECT Eid, Ename, Salary FROM Emp;
+
+where clause operators
+-----------------------
+ =
+<> or !=
+<
+< = 
+> 
+> = 
+Like 
+Between 
+IN 
+NOT IN 
+
+
+
+> SELECT * FROM Emp WHERE Ename LIKE 'C______';
+
+
+SELECT * FROM Emp WHERE Salary BETWEEN 8000 AND 10000;
+
+SELECT * FROM Emp WHERE Designation IN ('Manager','Designer');
+
+SELECT * FROM Emp WHERE Designation NOT IN ('Manager','Designer');
+
+
+
+Group by
+-------------
+SELECT * FROM Emp GROUP BY Ename;
+
+
+constraints
+------------
+Unique
+PK
+FK
+Check constraints: mySql do not support it directly...we have to write trigger fro it   :(
+
+
+
+
+creating master table and child table relationship
+=====================================================
+engine=InnoDB?
+mysql is a very flexibale (oracle=> community , lic)
+
+create table dept
+(
+	did int not null auto_increment,
+	dname char(10)not null,
+	primary key(did)
+)engine=InnoDB;
+
+
+
+create table employee
+(
+        eid int not null auto_increment,
+	ename char(10) not null,
+	did int not null,
+	primary key(eid),
+	foreign key(did) references dept(did) on delete cascade on update cascade
+)engine=InnoDB;
+
+
+
+
+Aggregate Function
+--------------------
+•	AVG( );
+•	COUNT( );
+•	MAX( );
+•	MIN( );
+•	SUM( );
+
+
+
+
+
+The HAVING Clause
+-----------------------
+SELECT * 
+FROM Emp 
+GROUP BY Salary 
+HAVING AVG(Perks)>900;
+
+
+
+The ORDER BY Clause
+===========================
+     
+The ORDER BY clause can be used to set 
+the order of the retrieved records. 
+
+
+
+SELECT * FROM Emp ORDER BY Eid DESC;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+The LIMIT Clause
+==========================
+The LIMIT clause can be used to limit 
+the number of records that have been returned 
+by the SELECT statement. 
+
+You can specify the start row, and number of records retrieved. 
+
+
+
+
+SELECT * FROM Emp LIMIT 0,2;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Joins
+=================================
+
+Types of Joins :
+•	INNER Joins
+•	OUTER Joins
+•	SELF Joins
+
+
+
+consider two tables
+
+Client and purchage
+-----	    -----------
+
+create table Client 
+(
+	c_id int not null ,
+	name char(20)not null,
+	city char(20)not null,
+	primary key(c_id)
+)engine=InnoDB;
+
+
+create table purchage
+(
+	product_id int not null,
+	product_details char(10) not null,
+	c_id int not null,
+	primary key(product_id ),
+	
+	foreign key(c_id) references client(c_id) on delete cascade	on update cascade
+)engine=InnoDB;
+
+===============================================
+one customer can purchased n products
+==================================================
+
+
+now populate some records
+--------------------------
+
+
+insert into client(c_id,name,city)values(1,'A K Ltd','Delhi');
+      
+insert into client(c_id,name,city)values(2,'V K Associate ','Mumbai');
+
+insert into client(c_id,name,city)values(3,'R K India','Banglore');
+
+insert into client(c_id,name,city)values(4,'R S P Ltd','Kolkata');
+
+
+
+
+
+insert into purchage(product_id,product_details,c_id)values(111,'Monitor',1);
+
+insert into purchage(product_id,product_details,c_id)values(112,'Processor',2);
+
+insert into purchage(product_id,product_details,c_id)values(113,'Keyboard',2);
+
+insert into purchage(product_id,product_details,c_id)values(114,'Mouse',3);
+
+
+will not work?
+==============================================================================
+insert into purchage(product_id,product_details,c_id)values(115,'CPU',5);
+
+
+
+
+
+INNER Joins/Equi joins
+===========
+default Join type based on equality .......
+
+
+
+SELECT * FROM Client
+     INNER JOIN purchage
+     ON Client.C_ID=purchage.C_ID;
+
+
+
+	or
+	======
+
+
+select * from client, purchage
+where client.c_id=purchage.c_id;
+
+
+
+
+OUTER Joins 
+===========
+very useful to find database inconsistancies
+
+an OUTER Join returns the all rows that returned by an INNER Join plus all 
+the rows from one table that 
+did not match any row from the other table. 
+
+
+
+
+Outer Join are divided in two types : 
+========================================
+
+LEFT OUTER Join
+
+
+
+RIGHT OUTER Join 
+
+
+
+LEFT OUTER Join 
+=======================
+to return all the rows that returned by an 
+INNER Join plus all the rows from first 
+table that did not match with any row from the 
+second table but with the NULL values for each column
+ from second table
+
+
+
+
+
+SELECT * FROM CLIENT
+LEFT OUTER JOIN purchage
+ON Client.C_ID=purchage.C_ID;
+
+
+
+
+
+
+
+RIGHT OUTER Join
+========================
+
+SELECT * FROM Client
+    RIGHT OUTER JOIN purchage
+    ON Client.C_ID=purchage.C_ID;
+
+
+
+
+SELF Join
+==========================
+joining an table with itself
+very useful for non equality condition
+
+theta joins
+
+
+list Clients that belongs to same city of C_ID=1
+==================================================
+
+SELECT b.C_ID,b.Name,b.City 
+FROM Client a, Client b
+WHERE a.City=b.City AND a.C_ID=1;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+views
+==============
+VIEW is a virtual table, which acts like a table but actually it contains no data. 
+
+for abstraction and security
+
+
+we want to create an view to see only those client records that are active in 
+purchage table 
+
+
+
+CREATE VIEW
+================
+CREATE VIEW Supp_Client AS
+    SELECT * FROM Client
+    WHERE C_ID IN (
+    SELECT C_ID FROM purchage)
+
+
+
+
+
+ALTER VIEW 
+==============
+
+ALTER VIEW Supp_Client AS
+    SELECT Client.C_ID, Client.Name, Client.City,
+    Products.Prod_Detail from Client, purchage
+    WHERE Client.C_ID=purchage.C_ID;
+
+now 
+========
+SELECT * FROM Supp_Client WHERE City='Delhi';
+
+
+
+DROP VIEW Statement
+====================
+DROP VIEW Supp_Client;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Stored Procedures
+=================
+
+
+
+
+
+
+
+
+
+
+
+Stored Procedures and Functions 
+================================
+
+
+
+
+Stored Procedures
+==================
+Stored Procedure is a set of statements, 
+which allow ease and flexibility for a programmer 
+because stored procedure is easy to execute than reissuing the number of 
+individual SQL statements. 
+
+
+
+Stored procedure can call another stored procedure also. 
+
+
+Stored Procedure can very useful where multiple 
+client applications are written in different 
+languages or it can be work on different 
+platforms but they need to perform the same database operations.
+
+
+
+Store procedure can improve the performance because 
+by using the stored procedure less information needs 
+to be sent between the server and the client. 
+
+
+
+It increase the load on the database server because 
+less work is done on the client side 
+and much work is done on the server side.
+
+
+
+
+
+
+
+
+CREATE PROCEDURE Syntax
+===================================================
+The general syntax of Creating a Stored Procedure is :
+
+        CREATE PROCEDURE proc_name ([proc_parameter[......]]) routine_body
+
+
+
+proc_name : procedure name
+
+proc_parameter : [ IN | OUT | INOUT ] param_name type
+
+routine_body : Valid SQL procedure statement
+
+
+An IN parameter
+==============
+ is used to pass the value into a procedure. 
+
+The procedure can be change the value but 
+when the procedure return the value then modification 
+is not visible to the caller. 
+
+
+An OUT parameter 
+=================
+is used to pass the value from the procedure
+ to the caller but its visible to the caller. 
+
+
+
+An INOUT parameter 
+===================
+is initialized by the caller and 
+it can be modified by the procedure, 
+and any change made by the procedure 
+is visible to the caller.
+
+
+
+
+
+simple stored procedure
+========================
+
+
+
+
+delimiter //
+	CREATE PROCEDURE Sproc(OUT p1 INT)
+  	SELECT COUNT(*) INTO p1 FROM Emp;
+    //
+
+
+
+
+
+bringing back delimiter to ;
+=============================
+delimiter ;
+
+calling SP
+================
+
+CALL Sproc(@a);
+
+
+
+
+printing Output
+================
+select @a;
+
+
+
+
+Another example:
+
+DELIMITER //
+
+
+CREATE PROCEDURE Test(IN num1 INT, IN num2 INT ,OUT param1 INT)
+
+BEGIN
+
+set param1 := num1 + num2;
+
+END 
+
+// 
+
+DELIMITER ; 
+
+
+
+
+functions
+===============
+must return an values
+
+CREATE FUNCTION Syntax
+==========================================
+The general syntax of Creating a Function is :
+        CREATE FUNCTION func_name ([func_parameter[,...]]) RETURNS type routine_body 
+
+
+func_name : Function name
+
+func_parameter : param_name type
+
+type : Any valid MySQL datatype
+
+routine_body : Valid SQL procedure statement
+
+
+
+The RETURN clause is mandatory for FUNCTION. 
+It used to indicate the return type of function.
+
+
+
+Example:
+================
+
+CREATE FUNCTION func(str CHAR(20)) RETURNS CHAR(50)
+RETURN CONCAT('WELCOME TO, ',str,'!');
+
+
+calling function
+=================
+SELECT func('HCl training session');
+
+
+try yourself
+=================
+ALTER PROCEDURE and ALTER FUNCTION Syntax
+DROP PROCEDURE and DROP FUNCTION Syntax
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CALL Statement Syntax
+=======================
+The CALL statement is used to call a procedure, 
+which has been defined previously. 
+
+
+
+CALL can return the values to its caller 
+through its parameters that are declared 
+as OUT or INOUT parameters. 
+
+
+
+This statement is also used to returns 
+the number of rows affected that a client program 
+can obtain at the SQL level by calling the ROW_COUNT(). 
+
+
+The general syntax of CALL Statement is :
+
+
+        CALL p_name([parameter[,...]])
+
+
+
+Example
+=============
+delimiter //
+	CREATE PROCEDURE Sp1(OUT p VARCHAR(20),OUT p1 VARCHAR(20),IN p2 INT)
+        SELECT Ename,City INTO p,p1 FROM Emp WHERE Eid=p2;
+     //
+
+
+
+
+bring delimiter back
+========================
+delimiter ;
+
+
+
+
+calling sp
+=============
+CALL Sp1(@Name,@City,1);
+
+
+display the result
+=====================
+SELECT @Name,@City;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+BEGIN.....END Compound Statement Syntax
+========================================
+delimiter //
+
+	CREATE PROCEDURE Proc(OUT p VARCHAR(20), OUT p1 VARCHAR(20),IN p2 INT)
+
+	BEGIN
+	INSERT INTO Emp VALUES(p2,'Suman','Pune','Web Designer',20000,965);
+	SELECT Ename,City INTO p,p1 FROM Emp WHERE Eid=p2;
+	END
+	
+	//
+
+
+
+
+delimiter ;
+
+
+
+CALL Proc(@Name,@City,8);
+
+
+
+SELECT @Name,@City;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+using DECLARE ,SET,SELECT......INTO Statement Syntax
+===================================================
+
+EXAMPLE
+=============
+
+delimiter //
+CREATE PROCEDURE Sproced(OUT p VARCHAR(20),OUT p1 VARCHAR(20),IN p2 INT)
+BEGIN
+	DECLARE a VARCHAR(20);
+	DECLARE b INT;
+	SET b=p2;
+	SET a='Dev%';
+	SELECT * FROM Emp WHERE Designation LIKE a;
+	SELECT Ename,City INTO p,p1 FROM Emp WHERE Eid=b;
+END
+//
+
+
+
+
+delimiter ;
+CALL Sproced(@Name,@City,5);
+
+
+SELECT @Name,@City;
+
+
+
+
+
+
+
+
+
+
+
+Conditions and Handlers
+========================
+sort of exception handling........
+
+
+Some conditions needs specific 
+handling and these conditions can 
+be related to errors or may be general flow control 
+inside a routine. 
+
+Handlers are the methods of handling conditions 
+that need to be dealt with. 
+
+
+
+
+Before describing conditions 
+and handlers lets try to produce some errors. 
+
+INSERT INTO Emp VALUES(1,'AAA','Delhi','Manager',20000,583);
+
+ERROR 1062 (23000): Duplicate entry '1' for key 1
+      ===  ========
+
+
+1062 :error no (different for differnt errors)
+
+23000:SQLSTATE that can be the same for a number of errors. 
+
+
+If these errors occur in our functions and procedures 
+then they will terminate out programs. 
+
+To deal with these conditions we have to create a handler.
+			=================================== 
+
+
+The general syntax of Handler is as follows:
+
+        DECLARE handler_type HANDLER FOR condition_value[,...] statement
+
+handler_type 
+========
+	can be of the following like CONTINUE, EXIT or UNDO. 
+
+	 CONTINUE
+	========
+	 the the program will carry on the process after the handler has been called. 
+
+	EXIT
+	====
+	 then the program will end immediately. 
+
+	The UNDO 
+	=======
+	is used on transactional tables to rollback work carried out up to that point. 
+
+	HANDLER FOR
+	===========
+	 tells the compiler, we are declaring a handler. 
+
+	Condition_value 
+	================
+	is used so that the handler fires when a define conditions met. 
+
+	The statement 
+	=============
+	is section of code that we want to execute when the handler is fired.  
+
+
+
+Example without error handling
+==================================
+
+delimiter //
+	CREATE PROCEDURE hproc(OUT p VARCHAR(30))
+	BEGIN
+		INSERT INTO Emp VALUES(1,'aaa','Delhi','Manager',20000,535);
+		SET p='Can not Insert';
+	END
+//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+now
+=========
+
+delimiter ;
+CALL hproc(@b);
+
+
+ERROR 1062 (23000): Duplicate entry '1' for key 1
+=========================================================
+
+
+SELECT @b;
+
+
+-----------------------------
+nothing was displayed why?
+----------------------------
+
+
+
+
+with error handling
+=======================
+
+delimiter //
+
+	CREATE PROCEDURE hproc(OUT p VARCHAR(35))
+	BEGIN
+	
+	DECLARE CONTINUE HANDLER FOR SQLSTATE '23000' SET @b=' With Errors';
+
+	INSERT INTO Emp VALUES(1,'AAA','Delhi','Manager',20000,698);
+	
+	SET p=CONCAT('Can not Insert ',@b);
+
+	END
+	//
+
+
+delimiter ;
+CALL hproc(@c);
+
+
+mysql> SELECT @c;
++---------------------------+
+| @c                        |
++---------------------------+
+| Can not Insert With Errors|
++---------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Writing Subqueries/Nested quaries
+====================================
+type of Subqueries
+
+Predicate Subqueries
+=====================
+ - extended logical constructs in the WHERE (and HAVING) clause.
+
+
+Scalar Subqueries
+===================
+ - standalone queries that return a single value; 
+they can be used anywhere a scalar value is used.
+
+
+Table Subqueries
+=================
+ - queries nested in the FROM clause
+
+
+
+
+
+consider tables
+==================
+mysql> SELECT * FROM Client;
++------+---------------+----------+
+| C_ID | Name          | City     |
++------+---------------+----------+
+| 1    | A K Ltd       | Delhi    |
+| 2    | V K Associate | Mumbai   |
+| 3    | R K India     | Banglore |
+| 4    | R S P Ltd     | Kolkata  |
+| 5    | A T Ltd       | Delhi    |
+| 6    | D T Info      | Delhi    |
++------+---------------+----------+
+6 rows in set (0.08 sec)
+mysql> SELECT * FROM Purchage;
++---------+-------------+------+----------+
+| Prod_ID | Prod_Detail | C_ID | price    |
++---------+-------------+------+----------+
+| 111     | Monitor     | 1    | 7000.00  |
+| 112     | Processor   | 2    | 11000.00 |
+| 113     | Keyboard    | 2    | 1200.00  |
+| 114     | Mouse       | 3    | 500.00   |
+| 115     | CPU         | 5    | 15500.00 |
++---------+-------------+------+----------+
+5 rows in set (0.00 sec)
+
+
+
+
+
+
+
+
+Predicate Subqueries
+=====================
+ - extended logical constructs in the WHERE (and HAVING) clause.
+
+Predicate Subqueries can be used in the HAVING and WHERE clause only 
+because both are special logical construct.
+
+ These subqueries must retrieve one column.
+
+
+	IN Subquery
+	----------
+		list of clients that are available in purchage table also
+		ie client that have purchaged also......
+
+
+
+		SELECT * FROM Client 
+		WHERE C_ID IN(SELECT C_ID FROM Purchage);
+
+
+
+		SELECT * FROM Client 
+		WHERE C_ID NOT IN(SELECT C_ID FROM Purchage);
+
+
+	Quantified Subqueries
+	---------------------
+	        Value_1 {=|>|<|>=|<=|<>} {ANY | ALL | SOME} (query_1)
+
+ 
+
+	Exists Subqueries
+	-------------------
+
+	The EXISTS subquery is used to tests whether a subquery 
+	returns at least one row or a qualifying row exists. 
+
+
+	also called correlated quaries
+		---------------------
+	
+	ex:
+	
+	SELECT * FROM Client
+   	WHERE EXISTS (SELECT * FROM Purchage WHERE Client.C_ID=Purchage.C_ID);
+
+
+
+Scalar Subqueries
+=================
+	The Scalar Subquery is a subquery which returns a single value. 
+
+	A Scalar subquery can be used almost anywhere a single column value can be used. 
+
+	The subquery have to reference only one column in the select list. 
+
+
+	It must not retrieve more than one row. 
+
+
+	When subquery retrieve one row then the value of select list column becomes the value of the 	Scalar Subquery. Example : 
+
+
+
+	Ex:
+		SELECT (SELECT Name FROM Client WHERE C_ID=1);
+
+
+
+		SELECT (SELECT C_ID FROM Purchage WHERE C_ID=2) FROM Client;
+		------------------------------------------------------------
+			this quary may not work
+			as return more then one values
+
+
+
+
+
+
+
+
+
+Flow Control Constructs
+=====================
+
+
+if
+========
+
+delimiter //
+CREATE PROCEDURE IFProc(IN p INT)
+	IF(p<7)
+		THEN
+	SELECT * FROM Client;
+		ELSE
+	SELECT * FROM Purchage;
+	END IF
+//
+
+delimiter;
+
+CALL IFProc(5);
+
+
+
+CASE Statement
+==============
+
+
+CREATE PROCEDURE WHENProc(IN p INT)
+    CASE p*10
+   WHEN 20 THEN SELECT * FROM Products WHERE Price<=7000;
+   WHEN 30 THEN SELECT * FROM Products WHERE Price>=7000;
+   ELSE
+   SELECT * FROM Products;
+   END CASE
+   //
+
+
+
+LOOP Statement
+=================
+        [begin_label:] LOOP statement_list END LOOP [end_label]
+
+	LEAVE Statement :aka break of c programming........
+
+
+
+
+CREATE PROCEDURE LProc()
+   BEGIN
+    DECLARE p INT;
+    SET p=1;
+    lbl: LOOP
+    SELECT * FROM Client WHERE C_ID=p;
+    SET p=p+1;
+    IF p > 5
+    THEN LEAVE lbl;
+    END IF;
+    END LOOP;
+    END
+    //
+
+-----------------
+try yourself:
+
+ITERATE Statement
+REPEAT Statement
+----------------------
+
+
+
+
+
+WHILE Statement
+================
+
+CREATE PROCEDURE WHILProc()
+
+    BEGIN
+    DECLARE p INT;
+    SET p=1;
+    WHILE p <= 5 DO
+    
+    UPDATE Products
+    SET Price=Price*1.03 WHERE C_ID=p;
+    SET p=p+1;
+    
+    IF p=4
+    THEN
+    SET p=p+1;
+     END IF;
+    END WHILE;
+    SELECT * FROM Products;
+    END
+    //
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Cursors
+=============
+
+
+Cursors are used when the SQL Select statement is 
+expected to return more than one row. 
+
+
+
+Cursors are only supported inside procedures and functions. 
+
+
+
+Cursors must be declared and its definition contains the query. 
+
+
+The cursor must be defined in the DECLARE section of the program.
+
+
+A cursor must be opened before processing and close after processing.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Syntax to declare the cursor :
+-----------------------------
+        DECLARE <cursor_name> CURSOR FOR <select_statement>
+
+
+
+
+
+Multiple cursors can be declared in the procedures and functions 
+but each cursor must have a unique name. 
+
+And in defining the cursor the select_statement cannot have INTO clause.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Syntax to open the cursor :
+---------------------------------
+        OPEN <cursor_name>
+
+By this statement we can open the previously declared cursor.
+
+
+
+
+
+
+
+Syntax to store data in the cursor :
+---------------------------------------
+        FETCH <cursor_name> INTO <var1>,<var2>
+
+	The above statement is used to fetch the next row 
+	if a row exists by using the defined open cursor.
+
+Syntax to close the cursor :
+--------------------------------
+        CLOSE <cursor_name>
+
+By this statement we can close the previously opened cursor. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Example:
+=========
+In the following example firstly we are declaring the Cursor and selecting the all record from Emp table. And after opened the cursor we fetch the record one by one from cursor. And then insert these record in Emp2 table
+
+
+delimiter //
+
+CREATE PROCEDURE DemoCurs1()
+    BEGIN
+    DECLARE d INT DEFAULT 0;
+    DECLARE id,sal INT;
+    DECLARE name,city,desig VARCHAR(20);
+
+    DECLARE cur CURSOR FOR SELECT * FROM Emp;
+
+    DECLARE CONTINUE HANDLER FOR SQLSTATE '02000' SET d=1;
+    DECLARE CONTINUE HANDLER FOR SQLSTATE '23000' SET d=1;
+    
+    OPEN cur;
+    lbl: LOOP
+    IF d=1 THEN
+    LEAVE lbl;
+    END IF;
+
+    IF NOT d=1 THEN
+    FETCH cur INTO id,name,city,desig,sal;
+    INSERT INTO Emp2 VALUES(id,name,city,desig,sal);
+    END IF;
+    END LOOP;
+    CLOSE cur;
+    END;
+    //
+
+
+
+
+
+--------
+delimiter ;
+
+CALL DemoCurs1();
+
+
+
+now
+---
+	SELECT * FROM Emp2;
+
+
+
+
+
+
+
+
+
+
+
+
+
+Triggers 
+===========
+
+A Trigger is a named database object which 
+defines some action that the database should take when 
+some databases related event occurs. 
+
+
+
+
+
+
+Triggers are executed when you issues a data manipulation command 
+like INSERT, DELETE, UPDATE on a table for which the trigger has been created. 
+
+
+
+They are automatically executed and also transparent to the user. 
+	 --------------
+
+
+But for creating the trigger the user must have the CREATE TRIGGER privilege. 
+
+
+
+
+
+
+The general syntax of CREATE TRIGGER is :
+=======================================
+        CREATE TRIGGER trigger_name trigger_time trigger_event ON tbl_name FOR EACH ROW 	trigger_statement
+
+
+
+	trigger_name
+	-----------
+		name of the trigger 
+		trigger can only be created on permanent table
+
+
+	trigger_time 
+	------------
+
+		Trigger_time means trigger action time. 
+		It can be BEFORE or AFTER
+
+	Trigger_event
+	------------
+		 specifies the statement that executes the trigger. 
+
+		The trigger_event can be any of the DML Statement :
+
+			 INSERT, UPDATE, DELETE.
+
+
+
+
+	Note:
+	We can not have the two trigger for a given table, 
+	which have the same trigger action time and event. 
+
+	For Instance : we cannot have two BEFORE INSERT triggers 
+	for same table. But we can have a BEFORE INSERT and BEFORE UPDATE 
+	trigger for a same table.
+
+
+
+
+
+
+
+
+
+	Trigger_statement have 
+	----------------------
+		the statement that executes when the trigger fires but 
+	if you want to execute multiple statement the you have to use the 
+	BEGIN------END compound statement.
+
+
+
+	We can refer the columns of the table that associated with trigger 
+	by using the OLD and NEW keyword. 
+	-----------------------------------
+
+
+	OLD.column_name is used to refer the column of an existing row before 
+	it is deleted or updated and NEW.column_name is used to 
+	refer the column of a new row that is inserted or after updated existing row.
+
+	In INSERT trigger we can use only NEW.column_name because there is no old row 
+	and in a DELETE trigger we can use only OLD.column_name because there is no new row. 
+
+
+
+	But in UPDATE trigger we can use both, OLD.column_name is 
+	used to refer the columns of a row before it is updated and NEW.Column_name 
+	is used to refer the column of the row after it is updated. 
+
+
+
+Example:
+	Write a trigger for updating the Salary column of Employee table before 
+	inserting any record in Emp table. 
+
+
+
+
+
+delimiter //
+	CREATE TRIGGER bi_trig_emp BEFORE INSERT ON Emp
+	FOR EACH ROW
+
+	BEGIN
+	UPDATE Employee SET Salary=Salary-300 WHERE salary>5000;
+	END;
+//
+
+
+
+
+delimiter ;
+
+and now inset an record in emp table and see the effect................
+
+
+Example:
+write an trigger to modifying the salary of Employee 
+table before updating the record of the same table
+
+
+
+
+	
+
+
+delimiter //
+CREATE TRIGGER updtrigger BEFORE UPDATE ON Employee
+FOR EACH ROW
+BEGIN
+IF NEW.Salary<=500 THEN
+SET NEW.Salary=10000;
+ELSEIF NEW.Salary>500 THEN
+SET NEW.Salary=15000;
+END IF;
+END
+//
+
+
+
+
+===================================================
+MySQL Transactional 
+===================================================
+MySQL5.0 supports local transactions by statements 
+like START TRANSACTION, SET AUTOCOMMIT, COMMIT and ROLLBACK. 
+
+
+
+Transaction means a group of SQL Statements, which executes as a unit
+
+
+
+
+
+
+
+
+step 1:
+open sql config-->remove instance
+
+step 2:
+uninstall mysql
+
+step 3:
+go to mysql installation directory delete it
+
+go to program file in C dir 
+hidden folders  
+organize in menu bar->select folder option-->
+view-->show hidden files
+
+c-->program data open it and delete mysql folder
+
+then try to install mysql
+

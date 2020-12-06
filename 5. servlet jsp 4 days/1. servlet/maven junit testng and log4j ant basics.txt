@@ -1,0 +1,824 @@
+topics:
+-----------------
+1. maven fundamental
+2. junit basics
+3. testng basics
+4. logging basics
+5. ant basics
+
+
+
+==================================================
+		Maven 
+==================================================
+
+Common problems and activities
+-------------------------------
+	=> mutiple jar , jar hell
+	=> How to find dependencies of one jar to another?
+		versioning issues
+
+	=> Project structure, how to standerized project st
+	=> building , publishing and deployemnt?
+
+
+
+	Maven solve all above problem!
+
+
+Maven hello World
+---------------------
+
+Donwload maven http://maven.apache.org/download.cgi
+
+
+set M2_HOME
+C:\tools\maven3.1
+
+PATH
+%M2_HOME%\bin
+
+
+-------------------------------
+
+
+build life cycle:
+
+	validate -> 
+		compile -> 
+			test-> 
+				package->
+					install (to local repo)-> 
+						deploy (does not deploy to server, but to remote repo)
+
+Create an core java project
+------------------------------
+
+Checking installation 
+	mvn -version
+
+	reposotories:
+		Local , Remote
+
+
+	Command:
+	mvn archetype:generate
+
+	choose a number? 106 (go with it)
+		Different archetype?model how u want to structure your probject!
+
+	Version ( version of archtype? )
+		choose latest
+
+	GroupId? 
+		Similer to package com.demo
+
+	artififact id?
+		name of application
+
+		MavanTestApp (name of jar)
+		version no?
+
+
+	After crreating project
+	------------------------
+
+		mvn compile ( it also run junit test cases)
+		mvn package 
+
+
+
+	Maven project in one go:
+	-------------------------
+	mvn archetype:create -DarchetypeGroupId=org.apache.maven.archetypes -DgroupId=com.demo.works -					DartifactId=SampleProject
+
+
+		=> it will create an class and test case 
+
+		=> then compile:mvn compile
+
+
+	update POM telling to use java 1.5
+	--------------------------------------
+
+
+	<build>
+		<plugins>
+		<plugin>
+			<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+				<source>1.7</source>
+			       <target>1.7</target>
+			     </configuration>
+		</plugin>
+    	</plugins>
+	</build>
+
+
+
+
+	then run test case;
+	----------------
+	mvn test
+
+
+
+	convert this project to eclipse project
+	------------------------------------
+	mvn  eclipse:eclipse
+
+
+	Now browse this project in ide
+
+
+	problem:
+	-----------
+	unbound classpath repo error!: eclipse dont know maven repo
+
+	M2_REPO  find .m2 dir
+
+	m2 eclipse plugin:
+
+
+	to copy jar to local copy
+	-------------------------
+
+	mvn dependency:copy-dependencies -DoutputDirectory=${project.build.directory}/lib
+
+
+
+	for web project:
+	--------------
+	http://crunchify.com/how-to-create-dynamic-web-project-using-maven-in-eclipse/
+
+
+
+
+
+
+
+
+
+
+
+
+==================================================
+	juint basics
+==================================================
+
+
+	Hello World calculator maven project
+	--------------------------
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
+
+
+
+	junit annotations:
+	==================
+
+
+	@BeforeClass:
+		Run only 1 time before all the test cases of class. 
+		Can be used to initialize resources.
+
+	@AfterClass :
+		Run only 1 time after all the test cases of class. 
+		Can be used to clean up the resources.
+
+	@Before :
+		Run annotated method every time individual test case is 
+		executed but run before the test case.
+
+	@After :
+		Run annotated method every time individual test case is 
+		executed but run after the test case
+
+
+       Assertion methods
+	-----------------
+      assertEquals():-
+      fail() :- fail a test with no reason
+      assertNull() :- Asserts that object is null.
+      assertNotNull() :- Asserts that object is not null.
+      assertTrue() :- Asserts that condition is true.
+      assertFalse() : Asserts that condition is false.
+
+
+	Exception Checking Using Junit
+	------------------------------
+
+
+	Ignore Test Cases
+	---------------
+	Sometimes we want to run only few test cases then we can ignore 
+	few test cases with @Ignore annotation. 
+
+	How to test with multiple parameters
+
+
+
+	more on junit
+	------------
+	Ignore
+	exception
+	timeout
+
+
+	Test suite
+	-------------
+	@RunWith(Suite.class)
+	@SuiteClasses({A.class, B.class}
+	public class TestAll{
+
+	}
+
+
+
+
+
+
+
+
+parameterized unit test cases*
+------------------------------
+Need of parameterized unit test case?
+
+Step 1: create an test class (CalculatorTest)
+
+ with annotation @RunWith
+@RunWith(Parameterized.class)
+
+
+
+step 2: create an static method with @Parameters
+
+
+	@Parameters
+	public static Collection<Object[]> testData(){
+		Object[][]data=new Object[][]{{4,2,2},{4,1,3}};
+		return Arrays.asList(data);
+	}
+
+
+
+step 3: put as instance variable
+
+	private int expectedResult;
+	private int firstNumber;
+	private int secondNumber;
+
+
+
+
+	
+	Calculator calculator;
+	
+	@Before
+	public void setUp() throws Exception {
+		calculator=new Calculator();
+	}
+	
+	public CalculatorTest(int expectedResult, int firstNumber, int secondNumber) {
+		super();
+		this.expectedResult = expectedResult;
+		this.firstNumber = firstNumber;
+		this.secondNumber = secondNumber;
+	}
+	
+	
+
+	@Test
+	public void testAdd(){
+		Assert.assertEquals(expectedResult, calculator.add(firstNumber, secondNumber));
+	}
+	@After
+	public void tearDown() throws Exception {
+		calculator=null;
+	}
+
+
+
+
+crud application
+================
+
+
+import java.util.Date;
+
+public class Event
+{
+    private int id;
+    
+    private String title;
+    
+
+	//getter setter
+}
+
+
+
+
+public interface EventDAO
+{
+    int saveEvent( Event event );
+    
+    Event getEvent( int id );
+    
+    void deleteEvent( int id );
+}
+
+
+
+public class MemoryEventDAO implements EventDAO
+{
+    private Map<Integer, Event> events;
+    
+    private int identifier;
+    
+    public MemoryEventDAO()
+    {
+        events = new HashMap<Integer, Event>();
+    }
+    
+    public int saveEvent( Event event )
+    {
+        event.setId( ++identifier );
+   
+        events.put( identifier, event );
+        
+        return identifier;
+    }
+    
+    public Event getEvent( int id )
+    {
+        return events.get( id );
+    }
+    
+    public void deleteEvent( int id )
+    {
+        events.remove( id );
+    }
+}
+
+
+jUnit 4.x
+----------------
+
+
+public class EventDAOAnnotatedTest
+{
+    private EventDAO eventDAO;
+    
+    private Event event;
+    
+    @Before
+    public void invokedBeforeTests() // Sets up the test fixture
+    {
+        eventDAO = new MemoryEventDAO(); // Instantiating a new EventDAO for each test
+        
+        
+        event = new Event( "U2 concert"); // Creating a convenient Event instance
+    }
+    
+    @Test
+    public void addEvent()
+    {
+        int id = eventDAO.saveEvent( event );
+        
+        event = eventDAO.getEvent( id );
+        
+        assertEquals( id, event.getId() ); // Verify equality between the added and the retrieved object
+        assertEquals( "U2 concert", event.getTitle() );        
+       
+    }
+
+    @Test
+    public void getEvent()
+    {
+        int id = eventDAO.saveEvent( event );
+
+        event = eventDAO.getEvent( id );
+        
+        assertNotNull( event );
+        
+        assertEquals( id, event.getId() );        
+        assertEquals( "U2 concert", event.getTitle() );        
+        
+        event = eventDAO.getEvent( -1 );
+        
+        assertNull( event ); // Verify that null is returned when object does not exist               
+    }
+
+    @Test
+    public void deleteEvent()
+    {
+        int id = eventDAO.saveEvent( event );
+        
+        event = eventDAO.getEvent( id );
+        
+        assertNotNull( event ); // Verify that event exists
+        
+        eventDAO.deleteEvent( id );
+        
+        event = eventDAO.getEvent( id );
+        
+        assertNull( event ); // Verify that event has been deleted
+    }
+    
+    @After
+    public void invokedAfterTests()
+    {
+        // Do some useful tear-down work
+    }
+}
+
+
+with annotations
+--------------------------
+
+public class EventDAOTest2Annotation {
+
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception {
+	}
+
+	@AfterClass
+	public static void tearDownAfterClass() throws Exception {
+	}
+
+	@Before
+	public void setUp() throws Exception {
+	}
+
+	@After
+	public void tearDown() throws Exception {
+	}
+
+}
+
+
+
+
+
+==================================================
+	testng basics
+==================================================
+
+	testng update site: http://beust.com/eclipse
+
+
+
+	testng dependencies:
+	----------------------
+	<dependency>
+  		<groupId>org.testng</groupId>
+  		<artifactId>testng</artifactId>
+  		<version>6.8</version>
+  		<scope>test</scope>
+	</dependency>
+
+	<dependency>
+       		 <groupId>org.seleniumhq.selenium</groupId>
+        	<artifactId>selenium-java</artifactId>
+       		 <version>2.53.0</version>
+    	</dependency> 
+
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+				 	 <source>1.7</source>
+			      		 <target>1.7</target>
+			     	</configuration>
+			</plugin>
+    		</plugins>
+	</build>
+
+TestNg
+------------
+
+1. intro TestNg
+2. install TestNg and write first TestNg test case
+3. create multiple test cases and run
+4. execute multiple program/classes using xml
+
+
+intro TestNg
+==============
+	In selenium using java 2 choices
+	junit and testNg
+
+TestNg?
+	Open source framework, designed to simplify a broad range of testing needs, from unit testing to system testing
+	initally developed for unit testing, now used for all king of testing.
+	more powerful from JUnit/NUnit
+
+
+Advantage:
+-------------
+	TestNg annotation are easy to create test cases
+
+	test cases can be grouped and prioritized easily
+
+	support parameterization
+
+	support data driven testing using dataproviders
+
+	execute multiple programs/classes using xml
+
+	Generate html reports
+
+	paralle test execution is possible
+
+	Supports integration with other tools and plug ins (ide and builds tools)
+	
+	Using TestNg we can create test cases, group test cases, prioritize test cases and generate test reports
+
+
+Installing and hello world (use pdf)
+------------------------------------
+
+
+great junit vs testng
+--------------------------
+http://www.mkyong.com/unittest/junit-4-vs-testng-comparison/
+
+
+
+
+==================================================
+	logging basics
+==================================================
+
+
+
+=> first must install jdk
+	JAVA_HOME
+
+	path
+
+	java and javac
+
+=> second step: configure maven
+
+	M2_HOME
+	path
+=> third step : then extract eclispe
+
+
+
+
+
+
+
+
+
+
+
+
+	maven : build tool, archetype aka std project template
+
+	Logging?
+	----------
+	
+	=> logging is essential for debugging and for maintaing our application
+
+	=> We must know what is going in our application, specially when error come SOP 
+	and printing exception message is not good?
+
+	 Writing system.out.println(\93\85.....\94);//Should not be used for debugging
+ 	Why?
+	-------
+	as it is very hard to remove those unnessary Sop once coding is done \85 
+	
+	It may produce serious problem in production enveronment\85
+	headach for admin peoples 
+
+	=> Real advantage of logging is that it can be enable/disable and debugging
+	 messages can be directed to the file
+
+
+	Logging framewrok? 
+	------------------
+	Log 4j 
+	log back 
+	Commons logging 
+	java.util.logging 
+
+	=> most commonly used one is log4j
+
+
+	=> we should not fix ourself with any one specific 
+	logging framework as we have to change as required.... 
+	go for facade ...use Simple Logging Facade for Java
+
+
+
+	SLF4j (it is a logging facade that keep u insulated form various logging framework)
+	======= 
+
+	
+	You----> SLF4j-----> log4j
+		  |-------->log back
+		  |---------> common logging
+
+	=> GPP while using log4j : always use log4j with slf4j
+
+
+	=> The Simple Logging Facade for Java or (SLF4J) serves as a 
+	simple facade or abstraction for various logging frameworks, 
+	e.g. java.util.logging, log4j and logback, allowing the end user to
+	plug in the desired logging framework at deployment time
+
+
+	Levels of logging
+	------------------
+
+	ALL----------->log everything 
+	DEBUG 
+	INFO
+	WARN 
+	ERROR 
+	FATAL 
+	OFF----------->Log nothing
+
+
+
+	maven dependencies:
+	--------------------
+<dependency>
+  <groupId>org.slf4j</groupId>
+  <artifactId>slf4j-api</artifactId>
+  <version>1.7.2</version>
+</dependency>
+<dependency>
+  <groupId>org.slf4j</groupId>
+  <artifactId>slf4j-log4j12</artifactId>
+  <version>1.7.2</version>
+</dependency>
+
+
+	Ref:
+	-----
+	http://www.mkyong.com/logging/log4j-log4j-properties-examples/
+	http://www.mkyong.com/logging/log4j-hello-world-example/
+
+	Hello World:
+	------------
+
+	import org.slf4j.Logger; 
+	import org.slf4j.LoggerFactory; 
+
+	public class Applications
+	 {
+	private static final Logger logger=LoggerFactory.getLogger(Applications.class); 
+
+		public static void main(String[] args) 
+		{
+
+	 	System.out.println("Hello world logging"); 
+		logger.info("stating logging!!!!"); 
+		System.out.println("Hello world logging"); 
+		logger.info("finished logging!!!!"); 
+		}
+	}
+
+
+
+	Ex:
+	----
+
+	private static final Logger logger=LoggerFactory.getLogger(Applications.class); 
+
+	logger.info("start logging"); 
+
+	String no="4x"; 
+	try 
+	{ 
+		Integer.parseInt(no); 
+	} 
+	catch(NumberFormatException ex)
+	 { 
+		logger.error("connot formet :"+no+" to and no....");
+	 } 
+
+
+
+
+
+
+
+
+
+
+
+
+
+==================================================
+	ant basics
+==================================================
+
+Ant intro:
+----------
+installation 
+
+ANT_HOME 
+c:\apache-ant-1.8.2-bin
+
+build.xml
+
+<?xml version="1.0"?>
+   <project name="Hello World Project" default="info">
+   
+   <target name="info">
+      <echo>Hello World - Welcome to Apache Ant!</echo>
+   </target>
+   
+</project>
+
+
+
+
+<?xml version="1.0"?>
+<project name="Hello World Project" default="info">
+
+   <property name="projectName" value="learningAnt"/>
+   <target name="info">
+      <echo>Apache Ant version is ${ant.version} - project name ${projectName} </echo>
+   </target>
+   
+</project>
+
+
+Using property file:
+-------------------
+
+
+<?xml version="1.0"?>
+<project name="Hello World Project" default="info">
+
+   <property file="build.properties"/>
+   
+      <target name="info">
+      <echo>Apache Ant version is ${ant.version} - project name ${projectName} </echo>
+   </target>
+   
+</project>
+
+
+build.properties
+----------------
+# The project name
+projectName=hello world ant project
+buildversion=3.3.2
+
+
+
+
+
+
+
+
+
+http://grokbase.com/t/gg/webdriver/147w9x1rma/unable-to-bind-to-locking-port-7054-within-45000-ms
+http://www.softwaretestinghelp.com/maven-project-setup-for-selenium-selenium-tutorial-24/
+http://www.mkyong.com/unittest/junit-4-vs-testng-comparison/
+http://www.softwaretestinghelp.com/maven-project-setup-for-selenium-selenium-tutorial-24/
+
+http://javarevisited.blogspot.in/2013/04/JUnit-tutorial-example-test-exception-thrown-by-java-method.html
+http://www.mkyong.com/tutorials/junit-tutorials/
+JUnit basics
+---------------
+
+
+
+
+
+
+
+
+	 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
